@@ -1,6 +1,8 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright Blender-DAZ-Scripts authors.
 
+# Notes:
+# Only works with rig that only has `mixamorig:` and not `mixamorig%d:`!
 # Usage:
 # Import any mixamo rig(s)
 # Select one or more armatures in the outliner
@@ -51,11 +53,11 @@ def get_armature_frame_range(armature_obj):
     return frame_start, frame_end
 
 
-def export_armature_as_bvh(armature_obj):
+def export_armature_as_bvh(armature_obj, original_name):
     blend_path = bpy.data.filepath
     export_dir = os.path.dirname(blend_path) if blend_path else os.path.expanduser("~")
 
-    filename = f"{armature_obj.name}_edit.bvh"
+    filename = f"{original_name}_edit.bvh"
     export_path = os.path.join(export_dir, filename)
 
     frame_start, frame_end = get_armature_frame_range(armature_obj)
@@ -109,10 +111,13 @@ def process_armature(obj):
 
     dup = duplicate_armature(obj)
     rename_bones(dup)
+    """
+    # doesn't seem to work
     dup.name = original_name
+    """
     obj.name = f"{original_name}_original_temp"
 
-    export_path = export_armature_as_bvh(dup)
+    export_path = export_armature_as_bvh(dup, original_name)
 
     obj.name = original_name
     delete_object(dup)
